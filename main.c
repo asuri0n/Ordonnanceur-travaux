@@ -19,6 +19,8 @@ char* listeCmds[5];
 int indiceDebut;
 int indiceFin;
 int nbElements;
+
+int pidATuer;
   
 typedef enum {
   false,
@@ -101,22 +103,38 @@ supprimerCmd(){
 	}
 }
 
+void 
+gestionAlarme(int numSig) {
+	
+}
+
 void
 lancerCmd(char *args[], int size, char * ligne){
-	sleep(15);
-	// on doit pouvoir interrompre la commande
-	signal(SIGQUIT, SIG_DFL);
-	signal(SIGINT, SIG_DFL);
-	signal(SIGTERM, SIG_DFL);
-	
-	// la commande en arrière plan ne doit pas lire l'entrée standard
-	int fd = open("/dev/null", O_RDONLY);
-	close(0);
-	dup(fd);
-	
-	mkargs(args, size, ligne);
-	execvp(args[0], args);
-	perror(args[0]);	
+	signal(SIGALRM,gestionAlarme);
+	int ppid;
+	switch (ppid = fork()) {
+		case -1:
+			perror("fork");
+		case 0: 
+			pidATuer = getppid();
+			alarm(10);
+			wait(NULL);
+			exit(0);
+		default:
+			signal(SIGQUIT, SIG_DFL);
+			signal(SIGINT, SIG_DFL);
+			signal(SIGTERM, SIG_DFL);
+			
+			// la commande en arrière plan ne doit pas lire l'entrée standard
+			int fd = open("/dev/null", O_RDONLY);
+			close(0);
+			dup(fd);
+			
+			sleep(11);
+			mkargs(args, size, ligne);
+			execvp(args[0], args);
+			perror(args[0]);
+	}
 }
 
 
@@ -179,15 +197,9 @@ main() {
 					perror("fork");
 				case 0: // Fils
 					ajoutCmd(ligne);
-					//lancerCmd(args, sizeof(args), listeCmds[indiceDebut]);
-					//lancerCmd(args, sizeof(args), ligne);
 				default: // Père
 					listePid[nbArgs] = pid;
-					nbArgs++;					
-					/*for(int i=0;i<nbArgs;i++){
-						printf("\n %d",listePid[i]);
-					}
-					printf("\n\n");*/
+					nbArgs++;	
 			}
 		} else {			
 			printf("Trop de processus en cours \n");
