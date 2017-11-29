@@ -197,7 +197,7 @@ main() {
         printf("\n %s", listeCmds[2]);
         printf("\n");
 
-        if (nbPid < nbMaxPid) {
+        if (nbPid < nbMaxPid && nbElements != 0) {
             switch (pid = fork()) {
                 case -1:
                     perror("fork");
