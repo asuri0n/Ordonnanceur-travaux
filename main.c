@@ -16,7 +16,8 @@ int nbMaxPid = 4;
 int listePid[4];
 int nbPid = 0;
 
-char *listeCmds[10];
+//char *listeCmds[10];
+char* listeCmds = NULL;
 int indiceDebut = 0;
 int indiceFin = 0;
 int nbElements = 0;
@@ -84,7 +85,7 @@ trouver_indice(int pid) {
 void
 ajoutCmd(char *ligne) {
     //printf("Ajout Commande : %s \n",ligne);
-    listeCmds[nbElements] = ligne;
+    strcpy(listeCmds, ligne);
     nbElements++;
     indiceFin++;
 
@@ -164,6 +165,7 @@ hand(int sig) {
 
 int
 main() {
+	char** listeCmds = (char **)malloc(10*sizeof(char *)); 
     char *ps1 = getenv("PS1"); // Le prompt du Bourne (Again) SHell
     char *ligne = 0;
     size_t MAXLIGNE = 0;
@@ -188,7 +190,7 @@ main() {
         }
 
         printf("Nombre de processus en cours d'execution : %d \n",
-               nbPid + 1); // +1 prise en compte de la commande prochaine
+               nbPid + 1); // +1 prise en compte de la commande prochaine			
 
         ajoutCmd(ligne);
 
@@ -210,7 +212,7 @@ main() {
                     listePid[nbPid] = pid;
                     nbPid++;
             }
-        } else {
+        } else if(nbPid < nbMaxPid){
             printf("Trop de processus en cours \n");
         }
     }
