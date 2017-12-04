@@ -85,7 +85,6 @@ trouver_indice(int pid) {
 void
 ajoutCmd(char *ligne) {
     printf("Ajout Commande : %s \n",ligne);
-    listeCmds[nbElements] = malloc(sizeof(char) * 100);
     strcpy(listeCmds[nbElements], ligne);
     nbElements++;
     indiceFin++;
@@ -99,7 +98,7 @@ ajoutCmd(char *ligne) {
 
 void
 supprimerCmd() {
-    //printf("Supprimer Commande \n");
+    printf("Supprimer Commande \n");
     nbElements--;
     indiceDebut++;
 
@@ -138,7 +137,7 @@ lancerCmd(char *args[], int size, char *ligne) {
                     close(0);
                     dup(fd);
 
-                    //sleep(11);
+                    //sleep(7);
                     mkargs(args, size, ligne);
                     execvp(args[0], args);
                     perror(args[0]);
@@ -167,7 +166,11 @@ hand(int sig) {
 
 int
 main() {
-	listeCmds = malloc( sizeof(char*) * 10);
+	listeCmds = malloc(sizeof(char)*10);
+	for(int i = 0 ; i < 10 ; i++){
+		listeCmds[i] = malloc(sizeof(char)*250);
+	}
+	
     char *ps1 = getenv("PS1"); // Le prompt du Bourne (Again) SHell
     char *ligne = 0;
     size_t MAXLIGNE = 0;
@@ -193,11 +196,6 @@ main() {
 
         ajoutCmd(ligne);
 
-        printf("\n %s", listeCmds[0]);
-        printf("\n %s", listeCmds[1]);
-        printf("\n %s", listeCmds[2]);
-        printf("\n");
-
         if (nbPid < nbMaxPid && nbElements != 0) {
             switch (pid = fork()) {
                 case -1:
@@ -215,5 +213,8 @@ main() {
             printf("Trop de processus en cours \n");
         }
     }
+    for (int i = 0; i < 10; i++)
+        free(listeCmds[i]);
+    free(listeCmds);
     return 0;
 }
