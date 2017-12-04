@@ -84,7 +84,7 @@ trouver_indice(int pid) {
 
 void
 ajoutCmd(char *ligne) {
-    printf("Ajout Commande : %s \n",ligne);
+    //printf("Ajout Commande : %s \n",ligne);
     strcpy(listeCmds[nbElements], ligne);
     nbElements++;
     indiceFin++;
@@ -98,7 +98,7 @@ ajoutCmd(char *ligne) {
 
 void
 supprimerCmd() {
-    printf("Supprimer Commande \n");
+    //printf("Supprimer Commande \n");
     nbElements--;
     indiceDebut++;
 
