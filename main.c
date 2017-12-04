@@ -17,7 +17,7 @@ int listePid[4];
 int nbPid = 0;
 
 //char *listeCmds[10];
-char* listeCmds = NULL;
+char** listeCmds = NULL;
 int indiceDebut = 0;
 int indiceFin = 0;
 int nbElements = 0;
@@ -33,7 +33,7 @@ bool;
 // supprime les blancs qui traînent en queue et retourne la nelle longueur
 int
 nettoie(char *ligne) {
-    int lg = strlen(ligne);
+    int lg = (int) strlen(ligne);
     while (isspace(ligne[lg - 1]))
         lg--;
     ligne[lg] = '\0';
@@ -84,8 +84,9 @@ trouver_indice(int pid) {
 
 void
 ajoutCmd(char *ligne) {
-    //printf("Ajout Commande : %s \n",ligne);
-    strcpy(listeCmds, ligne);
+    printf("Ajout Commande : %s \n",ligne);
+    listeCmds[nbElements] = malloc(sizeof(char) * 100);
+    strcpy(listeCmds[nbElements], ligne);
     nbElements++;
     indiceFin++;
 
@@ -137,7 +138,7 @@ lancerCmd(char *args[], int size, char *ligne) {
                     close(0);
                     dup(fd);
 
-                    sleep(5);
+                    //sleep(11);
                     mkargs(args, size, ligne);
                     execvp(args[0], args);
                     perror(args[0]);
@@ -148,6 +149,7 @@ lancerCmd(char *args[], int size, char *ligne) {
                     wait(NULL);
                     exit(10);
             }
+        default:break;
     }
 }
 
@@ -165,7 +167,7 @@ hand(int sig) {
 
 int
 main() {
-	char** listeCmds = (char **)malloc(10*sizeof(char *)); 
+	listeCmds = malloc( sizeof(char*) * 10);
     char *ps1 = getenv("PS1"); // Le prompt du Bourne (Again) SHell
     char *ligne = 0;
     size_t MAXLIGNE = 0;
@@ -179,18 +181,15 @@ main() {
     signal(SIGQUIT, nvligne);
     signal(SIGCHLD, hand);
     while (1) {
-        int lgligne;
         int pid;
         printf("%s", ps1);
         if (getline(&ligne, &MAXLIGNE, stdin) == -1)
             break;             // C'est fini
-        if ((lgligne = nettoie(ligne)) == 0) {
+        if (nettoie(ligne) == 0) {
             printf("Nombre de processus en cours d'execution : %d \n", nbPid);
             continue;          // juste une ligne vide, on continue
-        }
-
-        printf("Nombre de processus en cours d'execution : %d \n",
-               nbPid + 1); // +1 prise en compte de la commande prochaine			
+        } else
+            printf("Nombre de processus en cours d'execution : %d \n", nbPid + 1); // +1 prise en compte de la commande prochaine
 
         ajoutCmd(ligne);
 
